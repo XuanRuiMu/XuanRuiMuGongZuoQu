@@ -1,0 +1,1 @@
+# Auto chart generation package

@@ -1,0 +1,11 @@
+功能点：FP-01 新增 task-05-subagent-output-format 回归测试
+状态：已完成
+token_estimate：约 15K
+failure_tags：无
+evidence_link：.agents/skidence/traces/fp01.md
+修改文件：.agents/skills/循环工程/references/harness-test-suite/task-05-subagent-output-format/verify.py
+验证结果：测试 5/5 通过，lint 通过，构建 通过
+审查结果：Standards 通过，Spec 通过，P0规则 通过
+关键决策：无
+遗留问题：无
+下一步建议：无
