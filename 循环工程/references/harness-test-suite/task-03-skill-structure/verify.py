@@ -5,7 +5,6 @@ import pathlib
 
 必需文件列表 = [
     技能根目录 / 'SKILL.md',
-    技能根目录 / 'PROGRESS.md',
 ]
 必需引用文件列表 = [
     技能根目录 / 'references' / '子代理提示词模板.md',
