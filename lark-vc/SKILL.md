@@ -2,16 +2,17 @@
 name: lark-vc
 version: 1.0.0
 description:
-  "飞书视频会议：搜索历史会议、查询会议纪要产物（总结、待办、章节、逐字稿）、查询会议参会人快照。1.
-  查询已经结束的会议数量或详情时使用本技能（如历史日期｜昨天｜上周｜今天已经开过的会议等场景），查询未开始的会议日程使用
-  lark-calendar 技能。2. 支持通过关键词、时间范围、组织者、参与者、会议室等筛选条件搜索会议。3.
-  获取或整理会议纪要、逐字稿、录制产物时使用本技能。4. 查询“谁参加过某会议”“参会人列表”等参会人快照信息用 vc meeting get
-  --with-participants（任意时点可查，含已结束会议）。注意：**Agent 真实入会/离会、感知正在进行中会议的实时事件**请使用
-  lark-vc-agent 技能，本技能不覆盖写操作和会中事件流。"
+  “飞书视频会议：搜索历史会议、查询会议纪要产物（总结、待办、章节、逐字稿）、查询会议参会人快照、机器人入会/离会及会中实时事件。
+  1. 查询已结束的会议数量或详情（历史日期、昨天、上周、今天已开过的会等）
+  2. 通过关键词、时间范围、组织者、参与者、会议室等筛选条件搜索会议
+  3. 获取或整理会议纪要、逐字稿、录制产物
+  4. 查询参会人快照（任意时点可查，含已结束会议）
+  5. 机器人代用户入会/离会（提供9位会议号）
+  6. 读取进行中会议的实时事件（参会人加入/离开、发言、聊天、屏幕共享等）”
 metadata:
   requires:
-    bins: ["lark-cli"]
-  cliHelp: "lark-cli vc --help"
+    bins: [“lark-cli”]
+  cliHelp: “lark-cli vc --help”
 ---
 
 # vc (v1)
@@ -105,8 +106,8 @@ lark-cli vc meeting get --params '{"meeting_id":"<meeting_id>","with_participant
 | ------------------------------------------------------------- | ---------------------------------------------------- | -------------------------------------------- |
 | 参会人快照（谁参加过、何时入/离会，任意时点）                 | `vc meeting get --with-participants`                 | 本 skill                                     |
 | 已结束会议的发言内容                                          | `vc +notes` 取 `verbatim_doc_token` 再 `docs +fetch` | 本 skill                                     |
-| **进行中会议**的实时事件流（转写、聊天、共享、会中加入/离开） | `vc +meeting-events`                                 | [`lark-vc-agent`](../lark-vc-agent/SKILL.md) |
-| **Agent 真实入会 / 离会**                                     | `vc +meeting-join` / `vc +meeting-leave`             | [`lark-vc-agent`](../lark-vc-agent/SKILL.md) |
+| **进行中会议**的实时事件流（转写、聊天、共享、会中加入/离开） | `vc +meeting-events`                                 | 见下方「Agent 参会」 |
+| **Agent 真实入会 / 离会**                                     | `vc +meeting-join` / `vc +meeting-leave`             | 见下方「Agent 参会」 |
 
 ## 资源关系
 
@@ -160,7 +161,7 @@ Shortcut 是对常用操作的高级封装（`lark-cli vc +<verb> [flags]`）。
   [references/lark-vc-recording.md](references/lark-vc-recording.md)，了解查询参数和返回值结构。
 
 > **Agent 参会相关命令已独立**：`+meeting-join` / `+meeting-leave` / `+meeting-events` 请使用
-> [`lark-vc-agent`](../lark-vc-agent/SKILL.md) 技能。
+> 本技能的「Agent 参会」部分。
 
 ## API Resources
 
@@ -200,5 +201,55 @@ lark-cli vc meeting get --params '{"meeting_id": "<meeting_id>", "with_participa
 | `+search`                         | `vc:meeting.search:read`                                                                                          |
 | `meeting.get`                     | `vc:meeting.meetingevent:read`                                                                                    |
 
-> Agent 参会相关 scope（`vc:meeting.bot.join:write` / `vc:meeting.meetingevent:read`）见
-> [`lark-vc-agent`](../lark-vc-agent/SKILL.md)。
+---
+
+## Agent 参会（机器人入会/离会/会中事件）
+
+### 定位
+
+本部分负责"会中动作"，与上文的"会后查询"互补：
+
+| 用户意图 | 路由 |
+|----------|------|
+| "帮我入会 123456789"、"代我参会" | `+meeting-join` |
+| "会议里谁在发言"、"有人共享屏幕吗" | `+meeting-events` |
+| "退出会议" | `+meeting-leave` |
+
+### 入会
+
+```bash
+lark-cli vc +meeting-join --meeting-number <9位会议号>
+```
+
+- 只接受9位纯数字会议号
+- 返回的 `meeting.id` 必须记录
+- 仅支持 user 身份
+
+### 会中事件
+
+```bash
+lark-cli vc +meeting-events --meeting-id <meeting.id> --page-all --format pretty
+```
+
+- 输入是 `meeting_id`（长数字ID），非9位会议号
+- Bot必须真实参会过才能读取事件
+- 默认使用 `--page-all`，需识别分页信号
+- 每次回答前必须重新拉取事件流
+
+### 离会
+
+```bash
+lark-cli vc +meeting-leave --meeting-id <meeting.id>
+```
+
+### 权限
+
+| Shortcut | Scope |
+|----------|-------|
+| `+meeting-join` | `vc:meeting.bot.join:write` |
+| `+meeting-events` | `vc:meeting.meetingevent:read` |
+| `+meeting-leave` | `vc:meeting.bot.join:write` |
+
+### 内测提示
+
+当前功能正在内测中。若 `lark-cli` 提示 `missing required scope(s)` 或 `error.code=20017`，提示用户加入早鸟群：`https://go.larkoffice.com/join-chat/2f4nb0e1-fe00-4f67-bed7-25beaf533fbd`。
