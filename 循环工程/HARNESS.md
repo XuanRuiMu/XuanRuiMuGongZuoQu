@@ -6,8 +6,8 @@
 
 | 组件路径 | 作用 | 版本/最后修改时间 | 修改级别 |
 | --- | --- | --- | --- |
-| `SKILL.md` | 循环工程 skill 的主入口与完整工作流定义，包含 Orchestrator+Headless 模式、铁律、阶段跳过规则、完整工作流、停止条件、熔断规则与 Self-Harness 元循环 | 2026-07-08（明确过程性文件清理范围限定为本工作区/本项目内由本技能创建或修改的文件） | 禁止自动（必须先 AskUserQuestion 取得用户同意） |
-| `references/子代理提示词模板.md` | Headless Worker 的提示词模板，规定子代理必须读取 PROGRESS.md、返回简短结构化摘要、禁止写历史；新增 token_estimate / failure_tags / evidence_link 字段与 P0 规则自审；2026-07-08 追加 UUID/强类型参数前置校验与全中文命名检查项；2026-07-09 强制要求调用三轴审查 skill 并在返回格式中输出三轴审查结果 | 2026-07-09 | 待确认（改动返回结构，已获用户同意） |
+| `SKILL.md` | 循环工程 skill 的主入口与完整工作流定义，包含 Orchestrator+Headless 模式、铁律、阶段跳过规则、完整工作流、停止条件、熔断规则与 Self-Harness 元循环 | 2026-07-17（阶段3主代理循环逻辑增加依赖验证强制项与并行前强制编译验证；已获用户同意） | 禁止自动（必须先 AskUserQuestion 取得用户同意） |
+| `references/子代理提示词模板.md` | Headless Worker 的提示词模板，规定子代理必须读取 PROGRESS.md、返回简短结构化摘要、禁止写历史；新增 token_estimate / failure_tags / evidence_link 字段与 P0 规则自审；2026-07-08 追加 UUID/强类型参数前置校验与全中文命名检查项；2026-07-09 强制要求调用三轴审查 skill 并在返回格式中输出三轴审查结果；2026-07-17 追加 debug 日志安全自审与翻译模板修改测试同步自审两项强制检查 | 2026-07-17 | 待确认（改动返回结构，已获用户同意） |
 | `references/PROGRESS模板.md` | PROGRESS.md 的精简状态模板，规定只写当前状态、禁止写入历史/过程/文件清单 | 未变更 | 自动（仅格式模板调整，不改动业务规则） |
 | `references/Orchestrator-Headless模式.md` | 核心架构原理说明，解释 Context Wall 问题与 Orchestrator+Headless 解法 | 未变更 | 禁止自动（架构原理变更须经用户确认） |
 | `references/EnvironmentEngineering.md` | Environment Engineering 四维规范，定义 Permissions/Artifacts/Budget/Human-in-the-loop 约束与检查清单 | 2026-07-08（明确产物清理仅作用于本工作区/本项目内由本技能创建或修改的文件） | 待确认（涉及权限/预算/HITL 规则变更时须用户确认） |
